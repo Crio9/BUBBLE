@@ -1,10 +1,22 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 
-from backend.schemas import NoteCreate, NoteRead
 
-app = FastAPI(title="BUBBLE")
+from backend import models
+from backend.routes import router as notes_router
+from backend.database import engine, Base
 
-notes: dict[int, NoteRead] = {}
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
+    engine.dispose()
+
+app = FastAPI(title="BUBBLE", lifespan=lifespan)
+app.include_router(notes_router)
+
+
 
 @app.get("/health")
 def health() -> dict[str, str]:

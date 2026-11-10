@@ -5,13 +5,35 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       - ./backend:/app/backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://bubble:bubble_dev@db:5432/bubble
+    depends_on:
+      db:
+        condition: service_healthy
     command:
-     - python
-     - -m
-     - uvicorn
-     - backend.main:app
-     - --host
-     - 0.0.0.0
-     - --port
-     - "8000"
-     - --reload
+      - python
+      - -m
+      - uvicorn
+      - backend.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --reload
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: bubble
+      POSTGRES_PASSWORD: bubble_dev
+      POSTGRES_DB: bubble
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bubble -d bubble"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:

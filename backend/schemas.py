@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class NoteCreate(BaseModel):
@@ -17,6 +17,7 @@ class NoteUpdate(BaseModel):
     content: str | None = Field(default=None, min_length=1, max_length=1000)
     
 class NoteRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     title: str
     content: str
