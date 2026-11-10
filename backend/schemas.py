@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 
 
 class NoteCreate(BaseModel):
@@ -15,6 +15,13 @@ class NoteUpdate(BaseModel):
 
     title: str | None = Field(default=None, min_length=1, max_length=100)
     content: str | None = Field(default=None, min_length=1, max_length=1000)
+
+    @model_validator(mode="after")
+    def reject_explicit_null(self):
+        for field in self.model_fields_set:
+            if getattr(self, field) is None:
+                raise ValueError(f"{field} cannot be null")
+        return self
     
 class NoteRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)

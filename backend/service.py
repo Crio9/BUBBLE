@@ -45,9 +45,6 @@ def update_note(note_id: int, data: NoteUpdate, db: Session) -> Note:
     db.commit()
     db.refresh(note)
 
-    print("data:", type(data), repr(data))
-    print("update_data:", type(update_data), update_data)
-    print("note:", type(note), note.id, note.title, note.content)   
     return note
 
     
